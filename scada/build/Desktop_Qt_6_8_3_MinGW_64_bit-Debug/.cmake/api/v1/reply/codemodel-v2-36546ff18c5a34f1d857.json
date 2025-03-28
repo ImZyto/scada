@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-d6f8d80d83481537521d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "scada",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "scada::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-scada-Debug-98b1a2bce0cc40ab6ca5.json",
+					"name" : "scada",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "scada_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-scada_autogen-Debug-b40afdcb82d1f00927a8.json",
+					"name" : "scada_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "scada_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-scada_autogen_timestamp_deps-Debug-30967777d9cb7b29eeb9.json",
+					"name" : "scada_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug",
+		"source" : "C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}
