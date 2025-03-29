@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QDateTime>
 #include "filteraverage.h"
+#include "filtersmooth.h"
+#include "filtermedian.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     dataClient = new DataClient(this);
 
+    // Konfiguracja wykresu
     ui->plot->xAxis->setLabel("Czas");
     ui->plot->yAxis->setLabel("Wartość");
 
@@ -27,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->plot->xAxis->setTicker(timeTicker);
     ui->plot->xAxis->setRange(QDateTime::currentSecsSinceEpoch() - 60, QDateTime::currentSecsSinceEpoch());
 
+    // Połączenia
     connect(dataClient, &DataClient::connected, this, [this]() {
         updateStatus("Połączono z serwerem");
     });
@@ -45,8 +49,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionZamknij, &QAction::triggered, this, &MainWindow::close);
     connect(ui->buttonApplyOptions, &QPushButton::clicked, this, &MainWindow::onApplyDisplayOptions);
     connect(ui->listFilters, &QListWidget::itemClicked, this, &MainWindow::onLoadFilter);
+    connect(ui->plot, &QCustomPlot::legendDoubleClick, this, &MainWindow::onLegendItemDoubleClicked);
 
     loadDummyFilters();
+
+    // Ładuj domyślny filtr „Brak”
+    QListWidgetItem* firstItem = ui->listFilters->item(0);
+    if (firstItem) {
+        ui->listFilters->setCurrentItem(firstItem);
+        onLoadFilter();
+    }
 }
 
 MainWindow::~MainWindow()
@@ -86,8 +98,8 @@ void MainWindow::onApplyDisplayOptions()
     case 2: penStyle = Qt::DashLine; break;
     }
 
-    if (!graphs.isEmpty()) {
-        graphs.last()->setPen(QPen(graphs.last()->pen().color(), 2, penStyle));
+    if (!activeFilters.isEmpty()) {
+        activeFilters.last().graph->setPen(QPen(activeFilters.last().graph->pen().color(), 2, penStyle));
     }
 
     int xScale = ui->spinBoxScaleX->value();
@@ -105,34 +117,43 @@ void MainWindow::onApplyDisplayOptions()
 
 void MainWindow::onLoadFilter()
 {
+    if (!ui->listFilters->currentItem()) return;
+
     QString selected = ui->listFilters->currentItem()->text();
 
     delete currentFilter;
     currentFilter = nullptr;
 
+    DataProcessor* processor = nullptr;
     QPen pen(Qt::black, 2);
+
     if (selected == "FilterAverage") {
-        currentFilter = new FilterAverage(5);
+        processor = new FilterAverage(5);
         pen.setColor(Qt::blue);
-    }
-    else if (selected == "FilterSmooth") {
-        currentFilter = new FilterSmooth(0.2);
+    } else if (selected == "FilterSmooth") {
+        processor = new FilterSmooth(0.2);
         pen.setColor(Qt::darkGreen);
-    }
-    else if (selected == "FilterMedian") {
-        currentFilter = new FilterMedian(5);
+    } else if (selected == "FilterMedian") {
+        processor = new FilterMedian(5);
         pen.setColor(Qt::magenta);
+    } else if (selected == "Brak") {
+        processor = nullptr;
+        pen.setColor(Qt::red);
     }
 
     QCPGraph* newGraph = ui->plot->addGraph();
+    static QMap<QString, int> filterCounts;
+    int count = ++filterCounts[selected];
+    newGraph->setName(QString("%1 #%2").arg(selected).arg(count));
     newGraph->setPen(pen);
     newGraph->setLineStyle(QCPGraph::lsLine);
     newGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 3));
 
-    graphs.append(newGraph);
-    currentX.clear();
-    currentY.clear();
+    activeFilters.append({ selected, newGraph, processor });
 
+    ui->plot->legend->setVisible(true);
+    ui->plot->legend->setFont(QFont("Helvetica", 9));
+    ui->plot->legend->setBrush(QBrush(Qt::white));
     ui->plot->replot();
 }
 
@@ -156,6 +177,11 @@ void MainWindow::onDataReceived(const QByteArray &data)
     QString message = QString::fromUtf8(data).trimmed();
     qDebug() << "Odebrano dane:" << message;
 
+    if (activeFilters.isEmpty()) {
+        qWarning() << "Brak aktywnego wykresu – najpierw wybierz filtr!";
+        return;
+    }
+
     QStringList parts = message.split(',');
     if (parts.size() == 2) {
         QString timestampStr = parts[0].trimmed();
@@ -167,26 +193,49 @@ void MainWindow::onDataReceived(const QByteArray &data)
             double value = valueStr.toDouble(&ok);
             if (ok) {
                 double x = timestamp.toSecsSinceEpoch();
-                double y = value;
 
-                if (currentFilter)
-                    y = currentFilter->processSample(y);
+                for (auto& entry : activeFilters) {
+                    double yVal = value;
+                    if (entry.processor)
+                        yVal = entry.processor->processSample(value);
 
-                currentX.append(x);
-                currentY.append(y);
+                    entry.graph->addData(x, yVal);
 
-                if (currentX.size() > 1000) {
-                    currentX.removeFirst();
-                    currentY.removeFirst();
+                    if (entry.graph->data()->size() > 1000)
+                        entry.graph->data()->removeBefore(x - 300);
                 }
 
-                if (!graphs.isEmpty()) {
-                    graphs.last()->addData(x, y);
-                    ui->plot->xAxis->setRange(x - 60, x);
-                    ui->plot->yAxis->rescale();
-                    ui->plot->replot();
-                }
+                ui->plot->xAxis->setRange(x - 60, x);
+                ui->plot->yAxis->rescale();
+                ui->plot->replot();
             }
         }
     }
+}
+
+void MainWindow::onLegendItemDoubleClicked(QCPLegend *legend, QCPAbstractLegendItem *item, QMouseEvent *event)
+{
+    Q_UNUSED(legend);
+    Q_UNUSED(event);
+
+    if (!item) return;
+
+    QCPPlottableLegendItem *legendItem = qobject_cast<QCPPlottableLegendItem*>(item);
+    if (!legendItem) return;
+
+    QCPGraph *graph = qobject_cast<QCPGraph*>(legendItem->plottable());
+    if (!graph) return;
+
+    // Usuń wykres i jego filtr
+    ui->plot->removeGraph(graph);
+
+    for (int i = 0; i < activeFilters.size(); ++i) {
+        if (activeFilters[i].graph == graph) {
+            delete activeFilters[i].processor;
+            activeFilters.removeAt(i);
+            break;
+        }
+    }
+
+    ui->plot->replot();
 }

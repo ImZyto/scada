@@ -12,6 +12,12 @@
 #include <QVector>
 
 
+struct FilterEntry {
+    QString name;
+    QCPGraph* graph;
+    DataProcessor* processor;
+};
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -33,7 +39,12 @@ private slots:
     void onApplyDisplayOptions();
     void onLoadFilter();
     void onRefreshFilters();
-    void onDataReceived(const QByteArray &data);  // <- tu dodane do slotów
+    void onDataReceived(const QByteArray &data);
+    void onLegendItemDoubleClicked(QCPLegend *legend, QCPAbstractLegendItem *item, QMouseEvent *event);
+
+private:
+    QList<FilterEntry> activeFilters;
+
 
 private:
     Ui::MainWindow *ui;
@@ -44,7 +55,6 @@ private:
     void loadDummyFilters();
 
     QVector<QCPGraph*> graphs;
-    //QVector<double> currentX, currentY;
     DataProcessor* currentFilter;
 
     QVector<double> xData, yData;  // dane do wykresu
