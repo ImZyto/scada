@@ -3,7 +3,8 @@
 
 #include <QMainWindow>
 #include <QLabel>
-#include "dataclient.h"  // Dodane: klient TCP
+#include "qcustomplot.h"
+#include "dataclient.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -25,6 +26,7 @@ private slots:
     void onApplyDisplayOptions();
     void onLoadFilter();
     void onRefreshFilters();
+    void onDataReceived(const QByteArray &data);  // <- tu dodane do slotów
 
 private:
     Ui::MainWindow *ui;
@@ -33,6 +35,9 @@ private:
 
     void updateStatus(const QString &text);
     void loadDummyFilters();
+
+    QVector<double> xData, yData;  // dane do wykresu
+    int dataCounter = 0;
 };
 
 #endif // MAINWINDOW_H

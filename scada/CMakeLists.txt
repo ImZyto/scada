@@ -8,10 +8,12 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # Dodano Network do COMPONENTS
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Network)
+
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets PrintSupport)
 
 set(PROJECT_SOURCES
     main.cpp
@@ -20,6 +22,8 @@ set(PROJECT_SOURCES
     mainwindow.ui
     dataclient.cpp
     dataclient.h
+    qcustomplot.h
+    qcustomplot.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -38,9 +42,11 @@ else()
         )
     endif()
 endif()
-
+target_include_directories(scada PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # Dodano Network do linkowania
 target_link_libraries(scada PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
+target_link_libraries(scada PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::PrintSupport)
+
 
 # Bundle properties
 if(${QT_VERSION} VERSION_LESS 6.1.0)
