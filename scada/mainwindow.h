@@ -45,7 +45,6 @@ private slots:
 private:
     QList<FilterEntry> activeFilters;
 
-
 private:
     Ui::MainWindow *ui;
     QLabel *statusLabel;
@@ -59,6 +58,9 @@ private:
 
     QVector<double> xData, yData;  // dane do wykresu
     int dataCounter = 0;
+    int currentXScale = 60;
+    int currentYScale = 10;
+    double lastYValue = 0.0;
 };
 
 #endif // MAINWINDOW_H

@@ -14,6 +14,16 @@ MainWindow::MainWindow(QWidget *parent)
     , currentFilter(nullptr)
 {
     ui->setupUi(this);
+    ui->spinBoxScaleX->setValue(40);
+    ui->spinBoxScaleY->setValue(10);
+
+    currentXScale = 40;
+    currentYScale = 10;
+
+    double now = QDateTime::currentSecsSinceEpoch();
+    ui->plot->xAxis->setRange(now - currentXScale, now);
+    ui->plot->yAxis->setRange(0, currentYScale);
+
     ui->labelPlotPlaceholder->hide();
 
     statusLabel = new QLabel("Status: Brak połączenia");
@@ -58,6 +68,8 @@ MainWindow::MainWindow(QWidget *parent)
     if (firstItem) {
         ui->listFilters->setCurrentItem(firstItem);
         onLoadFilter();
+
+
     }
 }
 
@@ -85,10 +97,13 @@ void MainWindow::onDisconnectClicked()
 
 void MainWindow::onApplyDisplayOptions()
 {
+    currentXScale = ui->spinBoxScaleX->value();
+
     bool gridOn = ui->checkBoxGrid->isChecked();
     ui->plot->xAxis->grid()->setVisible(gridOn);
     ui->plot->yAxis->grid()->setVisible(gridOn);
 
+    // Styl linii
     int styleIndex = ui->comboBoxLineStyle->currentIndex();
     Qt::PenStyle penStyle = Qt::SolidLine;
 
@@ -102,17 +117,28 @@ void MainWindow::onApplyDisplayOptions()
         activeFilters.last().graph->setPen(QPen(activeFilters.last().graph->pen().color(), 2, penStyle));
     }
 
+    // Zakres X
     int xScale = ui->spinBoxScaleX->value();
-    int yScale = ui->spinBoxScaleY->value();
+    if (!activeFilters.isEmpty()) {
+        QCPGraph* lastGraph = activeFilters.last().graph;
+        if (!lastGraph->data()->isEmpty()) {
+            double lastX = (--(lastGraph->data()->constEnd()))->key;
+            ui->plot->xAxis->setRange(lastX - xScale, lastX);
+        }
+    }
 
-    double now = QDateTime::currentSecsSinceEpoch();
-    ui->plot->xAxis->setRange(now - xScale, now);
-    ui->plot->yAxis->setRange(0, yScale);
+    // Zakres Y tylko jeśli faktycznie zmieniony
+    int newYScale = ui->spinBoxScaleY->value();
+    if (newYScale != currentYScale) {
+        currentYScale = newYScale;
+        if (currentYScale > 0) {
+            ui->plot->yAxis->setRange(lastYValue - currentYScale / 2.0, lastYValue + currentYScale / 2.0);
+        } else {
+            ui->plot->yAxis->rescale();
+        }
+    }
 
     ui->plot->replot();
-
-    ui->spinBoxScaleX->setValue(60);
-    ui->spinBoxScaleY->setValue(10);
 }
 
 void MainWindow::onLoadFilter()
@@ -155,6 +181,20 @@ void MainWindow::onLoadFilter()
     ui->plot->legend->setFont(QFont("Helvetica", 9));
     ui->plot->legend->setBrush(QBrush(Qt::white));
     ui->plot->replot();
+
+    switch (newGraph->pen().style()) {
+    case Qt::SolidLine:
+        ui->comboBoxLineStyle->setCurrentIndex(0);
+        break;
+    case Qt::DotLine:
+        ui->comboBoxLineStyle->setCurrentIndex(1);
+        break;
+    case Qt::DashLine:
+        ui->comboBoxLineStyle->setCurrentIndex(2);
+        break;
+    default:
+        ui->comboBoxLineStyle->setCurrentIndex(0);
+    }
 }
 
 void MainWindow::onRefreshFilters()
@@ -191,6 +231,7 @@ void MainWindow::onDataReceived(const QByteArray &data)
         if (timestamp.isValid()) {
             bool ok;
             double value = valueStr.toDouble(&ok);
+            lastYValue = value;
             if (ok) {
                 double x = timestamp.toSecsSinceEpoch();
 
@@ -205,8 +246,12 @@ void MainWindow::onDataReceived(const QByteArray &data)
                         entry.graph->data()->removeBefore(x - 300);
                 }
 
-                ui->plot->xAxis->setRange(x - 60, x);
-                ui->plot->yAxis->rescale();
+                ui->plot->xAxis->setRange(x - currentXScale, x);
+                if (currentYScale > 0) {
+                    // Nic nie zmieniaj – użytkownik już ustawił zakres ręcznie
+                } else {
+                    ui->plot->yAxis->rescale();
+                }
                 ui->plot->replot();
             }
         }

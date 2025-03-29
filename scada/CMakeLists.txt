@@ -37,6 +37,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         filtersmooth.cpp
         filtermedian.h
         filtermedian.cpp
+        idatafilterplugin.h
     )
 else()
     if(ANDROID)
