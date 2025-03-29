@@ -1,9 +1,0 @@
-C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/CMakeFiles/scada.dir
-C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
-C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
-C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
-C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/CMakeFiles/install.dir
-C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
-C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
-C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/CMakeFiles/scada_autogen_timestamp_deps.dir
-C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/CMakeFiles/scada_autogen.dir
