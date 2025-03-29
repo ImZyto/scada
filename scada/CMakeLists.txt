@@ -30,6 +30,13 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(scada
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        filteraverage.h
+        dataprocessor.h
+        filteraverage.cpp
+        filtersmooth.h
+        filtersmooth.cpp
+        filtermedian.h
+        filtermedian.cpp
     )
 else()
     if(ANDROID)

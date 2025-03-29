@@ -4,60 +4,47 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QDateTime>
+#include "filteraverage.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , currentFilter(nullptr)
 {
     ui->setupUi(this);
-
     ui->labelPlotPlaceholder->hide();
 
-    // Status bar
     statusLabel = new QLabel("Status: Brak połączenia");
     ui->statusbar->addPermanentWidget(statusLabel);
 
-    // Inicjalizacja klienta TCP
     dataClient = new DataClient(this);
 
-    // Inicjalizacja wykresu
-    ui->plot->addGraph();
     ui->plot->xAxis->setLabel("Czas");
     ui->plot->yAxis->setLabel("Wartość");
 
     QSharedPointer<QCPAxisTickerDateTime> timeTicker(new QCPAxisTickerDateTime);
     timeTicker->setDateTimeFormat("HH:mm:ss");
     ui->plot->xAxis->setTicker(timeTicker);
-
     ui->plot->xAxis->setRange(QDateTime::currentSecsSinceEpoch() - 60, QDateTime::currentSecsSinceEpoch());
 
-    ui->plot->graph(0)->setPen(QPen(Qt::blue, 2));
-    ui->plot->graph(0)->setLineStyle(QCPGraph::lsLine);
-    ui->plot->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 3));
-
-    // Połączenia sygnałów z DataClient
     connect(dataClient, &DataClient::connected, this, [this]() {
         updateStatus("Połączono z serwerem");
     });
-
     connect(dataClient, &DataClient::disconnected, this, [this]() {
         updateStatus("Rozłączono");
     });
-
     connect(dataClient, &DataClient::dataReceived, this, &MainWindow::onDataReceived);
-
     connect(dataClient, &DataClient::errorOccurred, this, [this](const QString &error) {
         QMessageBox::warning(this, "Błąd połączenia", error);
     });
 
-    // Akcje menu
     connect(ui->actionPolaczZSerwerem, &QAction::triggered, this, &MainWindow::onConnectClicked);
     connect(ui->actionRozlacz, &QAction::triggered, this, &MainWindow::onDisconnectClicked);
     connect(ui->actionZaladujFiltr, &QAction::triggered, this, &MainWindow::onLoadFilter);
     connect(ui->actionOdswiezFiltry, &QAction::triggered, this, &MainWindow::onRefreshFilters);
-
-    // Przycisk Zastosuj
+    connect(ui->actionZamknij, &QAction::triggered, this, &MainWindow::close);
     connect(ui->buttonApplyOptions, &QPushButton::clicked, this, &MainWindow::onApplyDisplayOptions);
+    connect(ui->listFilters, &QListWidget::itemClicked, this, &MainWindow::onLoadFilter);
 
     loadDummyFilters();
 }
@@ -65,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     dataClient->disconnectFromServer();
+    delete currentFilter;
     delete ui;
 }
 
@@ -98,7 +86,9 @@ void MainWindow::onApplyDisplayOptions()
     case 2: penStyle = Qt::DashLine; break;
     }
 
-    ui->plot->graph(0)->setPen(QPen(Qt::blue, 2, penStyle));
+    if (!graphs.isEmpty()) {
+        graphs.last()->setPen(QPen(graphs.last()->pen().color(), 2, penStyle));
+    }
 
     int xScale = ui->spinBoxScaleX->value();
     int yScale = ui->spinBoxScaleY->value();
@@ -109,14 +99,41 @@ void MainWindow::onApplyDisplayOptions()
 
     ui->plot->replot();
 
-    // Reset spinnerów
     ui->spinBoxScaleX->setValue(60);
     ui->spinBoxScaleY->setValue(10);
 }
 
 void MainWindow::onLoadFilter()
 {
-    QMessageBox::information(this, "Filtry", "Załadowano filtr.");
+    QString selected = ui->listFilters->currentItem()->text();
+
+    delete currentFilter;
+    currentFilter = nullptr;
+
+    QPen pen(Qt::black, 2);
+    if (selected == "FilterAverage") {
+        currentFilter = new FilterAverage(5);
+        pen.setColor(Qt::blue);
+    }
+    else if (selected == "FilterSmooth") {
+        currentFilter = new FilterSmooth(0.2);
+        pen.setColor(Qt::darkGreen);
+    }
+    else if (selected == "FilterMedian") {
+        currentFilter = new FilterMedian(5);
+        pen.setColor(Qt::magenta);
+    }
+
+    QCPGraph* newGraph = ui->plot->addGraph();
+    newGraph->setPen(pen);
+    newGraph->setLineStyle(QCPGraph::lsLine);
+    newGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 3));
+
+    graphs.append(newGraph);
+    currentX.clear();
+    currentY.clear();
+
+    ui->plot->replot();
 }
 
 void MainWindow::onRefreshFilters()
@@ -128,6 +145,7 @@ void MainWindow::onRefreshFilters()
 void MainWindow::loadDummyFilters()
 {
     ui->listFilters->clear();
+    ui->listFilters->addItem("Brak");
     ui->listFilters->addItem("FilterSmooth");
     ui->listFilters->addItem("FilterMedian");
     ui->listFilters->addItem("FilterAverage");
@@ -138,7 +156,6 @@ void MainWindow::onDataReceived(const QByteArray &data)
     QString message = QString::fromUtf8(data).trimmed();
     qDebug() << "Odebrano dane:" << message;
 
-    // Oczekiwany format: "2025-03-29 14:10:12, 4.37"
     QStringList parts = message.split(',');
     if (parts.size() == 2) {
         QString timestampStr = parts[0].trimmed();
@@ -152,21 +169,23 @@ void MainWindow::onDataReceived(const QByteArray &data)
                 double x = timestamp.toSecsSinceEpoch();
                 double y = value;
 
-                // Dodaj nowe dane do bufora
-                xData.append(x);
-                yData.append(y);
+                if (currentFilter)
+                    y = currentFilter->processSample(y);
 
-                // Usuń dane starsze niż 5 minut (300 sekund)
-                while (!xData.isEmpty() && xData.first() < x - 300) {
-                    xData.removeFirst();
-                    yData.removeFirst();
+                currentX.append(x);
+                currentY.append(y);
+
+                if (currentX.size() > 1000) {
+                    currentX.removeFirst();
+                    currentY.removeFirst();
                 }
 
-                // Aktualizuj wykres
-                ui->plot->graph(0)->setData(xData, yData);
-                ui->plot->xAxis->setRange(x - 60, x); // przesuwanie wykresu
-                ui->plot->yAxis->rescale();           // dopasowanie osi Y
-                ui->plot->replot();
+                if (!graphs.isEmpty()) {
+                    graphs.last()->addData(x, y);
+                    ui->plot->xAxis->setRange(x - 60, x);
+                    ui->plot->yAxis->rescale();
+                    ui->plot->replot();
+                }
             }
         }
     }

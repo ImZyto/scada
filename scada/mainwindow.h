@@ -1,10 +1,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "dataprocessor.h"
+#include "filteraverage.h"
+#include "filtersmooth.h"
+#include "filtermedian.h"
 #include <QMainWindow>
 #include <QLabel>
 #include "qcustomplot.h"
 #include "dataclient.h"
+#include <QVector>
+
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -35,6 +42,10 @@ private:
 
     void updateStatus(const QString &text);
     void loadDummyFilters();
+
+    QVector<QCPGraph*> graphs;
+    //QVector<double> currentX, currentY;
+    DataProcessor* currentFilter;
 
     QVector<double> xData, yData;  // dane do wykresu
     int dataCounter = 0;

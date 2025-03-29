@@ -141,7 +141,7 @@
     </property>
     <addaction name="actionPolaczZSerwerem"/>
     <addaction name="actionRozlacz"/>
-    <addaction name="actionZamnij"/>
+    <addaction name="actionZamknij"/>
    </widget>
    <widget class="QMenu" name="menuKonfiguracjaWtyczek">
     <property name="title">
@@ -164,9 +164,9 @@
     <string>Rozłącz</string>
    </property>
   </action>
-  <action name="actionZamnij">
+  <action name="actionZamknij">
    <property name="text">
-    <string>Zamnij</string>
+    <string>Zamknij</string>
    </property>
   </action>
   <action name="actionZaladujFiltr">
