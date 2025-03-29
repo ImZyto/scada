@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QLabel>
+#include "dataclient.h"  // Dodane: klient TCP
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -28,6 +29,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QLabel *statusLabel;
+    DataClient *dataClient;
 
     void updateStatus(const QString &text);
     void loadDummyFilters();

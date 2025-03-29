@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -8,9 +9,29 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Dodanie status label do statusbar
+    // Status bar
     statusLabel = new QLabel("Status: Brak połączenia");
     ui->statusbar->addPermanentWidget(statusLabel);
+
+    // Inicjalizacja klienta TCP
+    dataClient = new DataClient(this);
+
+    // Połączenia sygnałów z DataClient
+    connect(dataClient, &DataClient::connected, this, [this]() {
+        updateStatus("Połączono z serwerem");
+    });
+
+    connect(dataClient, &DataClient::disconnected, this, [this]() {
+        updateStatus("Rozłączono");
+    });
+
+    connect(dataClient, &DataClient::dataReceived, this, [this](const QByteArray &data) {
+        qDebug() << "Odebrano dane:" << data;
+    });
+
+    connect(dataClient, &DataClient::errorOccurred, this, [this](const QString &error) {
+        QMessageBox::warning(this, "Błąd połączenia", error);
+    });
 
     // Podłączenie akcji menu
     connect(ui->actionPolaczZSerwerem, &QAction::triggered, this, &MainWindow::onConnectClicked);
@@ -18,10 +39,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionZaladujFiltr, &QAction::triggered, this, &MainWindow::onLoadFilter);
     connect(ui->actionOdswiezFiltry, &QAction::triggered, this, &MainWindow::onRefreshFilters);
 
-    // Podłączenie przycisku Zastosuj
+    // Przycisk Zastosuj
     connect(ui->buttonApplyOptions, &QPushButton::clicked, this, &MainWindow::onApplyDisplayOptions);
 
-    // Załaduj przykładowe filtry
+    // Dummy data
     loadDummyFilters();
 }
 
@@ -37,12 +58,12 @@ void MainWindow::updateStatus(const QString &text)
 
 void MainWindow::onConnectClicked()
 {
-    updateStatus("Połączono z 127.0.0.1:1234");
+    dataClient->connectToServer("127.0.0.1", 1234);
 }
 
 void MainWindow::onDisconnectClicked()
 {
-    updateStatus("Rozłączono");
+    dataClient->disconnectFromServer();
 }
 
 void MainWindow::onApplyDisplayOptions()
