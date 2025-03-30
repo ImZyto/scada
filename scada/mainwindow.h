@@ -41,6 +41,7 @@ private slots:
     void onRefreshFilters();
     void onDataReceived(const QByteArray &data);
     void onLegendItemDoubleClicked(QCPLegend *legend, QCPAbstractLegendItem *item, QMouseEvent *event);
+    void on_sliderTimeline_valueChanged(int value);
 
 private:
     QList<FilterEntry> activeFilters;
@@ -61,6 +62,11 @@ private:
     int currentXScale = 60;
     int currentYScale = 10;
     double lastYValue = 0.0;
+
+    QMap<QString, QVector<QPair<double, double>>> dataBuffers;
+    const int maxBufferSize = 1000;
+    int currentSliderValue = 100;
+    bool liveScroll = true;
 };
 
 #endif // MAINWINDOW_H

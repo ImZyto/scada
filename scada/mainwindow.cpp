@@ -7,6 +7,9 @@
 #include "filteraverage.h"
 #include "filtersmooth.h"
 #include "filtermedian.h"
+#include <QInputDialog>
+
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -40,6 +43,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->plot->xAxis->setTicker(timeTicker);
     ui->plot->xAxis->setRange(QDateTime::currentSecsSinceEpoch() - 60, QDateTime::currentSecsSinceEpoch());
 
+    ui->plot->xAxis->grid()->setVisible(false);
+    ui->plot->yAxis->grid()->setVisible(false);
+    bool isGridVisible = ui->plot->xAxis->grid()->visible();
+    ui->checkBoxGrid->setChecked(isGridVisible);
     // Połączenia
     connect(dataClient, &DataClient::connected, this, [this]() {
         updateStatus("Połączono z serwerem");
@@ -87,8 +94,31 @@ void MainWindow::updateStatus(const QString &text)
 
 void MainWindow::onConnectClicked()
 {
-    dataClient->connectToServer("127.0.0.1", 1234);
+    // Domyślne wartości
+    QString defaultIp = "127.0.0.1";
+    int defaultPort = 1234;
+
+    // Pytanie o IP
+    bool okIp;
+    QString ip = QInputDialog::getText(this, "Adres IP",
+                                       "Wprowadź adres IP serwera:",
+                                       QLineEdit::Normal, defaultIp, &okIp);
+
+    if (!okIp || ip.isEmpty())
+        return;
+
+    // Pytanie o port
+    bool okPort;
+    int port = QInputDialog::getInt(this, "Port",
+                                    "Wprowadź port serwera:",
+                                    defaultPort, 1, 65535, 1, &okPort);
+
+    if (!okPort)
+        return;
+
+    dataClient->connectToServer(ip, port);
 }
+
 
 void MainWindow::onDisconnectClicked()
 {
@@ -118,28 +148,30 @@ void MainWindow::onApplyDisplayOptions()
     }
 
     // Zakres X
-    int xScale = ui->spinBoxScaleX->value();
     if (!activeFilters.isEmpty()) {
         QCPGraph* lastGraph = activeFilters.last().graph;
         if (!lastGraph->data()->isEmpty()) {
             double lastX = (--(lastGraph->data()->constEnd()))->key;
-            ui->plot->xAxis->setRange(lastX - xScale, lastX);
+
+            if (liveScroll) {
+                ui->plot->xAxis->setRange(lastX - currentXScale, lastX);
+            } else {
+                // np. zatrzymaj na obecnym zakresie albo nie zmieniaj nic
+            }
         }
     }
 
     // Zakres Y tylko jeśli faktycznie zmieniony
-    int newYScale = ui->spinBoxScaleY->value();
-    if (newYScale != currentYScale) {
-        currentYScale = newYScale;
-        if (currentYScale > 0) {
-            ui->plot->yAxis->setRange(lastYValue - currentYScale / 2.0, lastYValue + currentYScale / 2.0);
-        } else {
-            ui->plot->yAxis->rescale();
-        }
+    currentYScale = ui->spinBoxScaleY->value();
+    if (currentYScale > 0) {
+        ui->plot->yAxis->setRange(0, currentYScale);
+    } else {
+        ui->plot->yAxis->rescale();
     }
 
     ui->plot->replot();
 }
+
 
 void MainWindow::onLoadFilter()
 {
@@ -212,6 +244,16 @@ void MainWindow::loadDummyFilters()
     ui->listFilters->addItem("FilterAverage");
 }
 
+bool isGraphStillInPlot(QCustomPlot* plot, QCPGraph* graphToFind)
+{
+    int count = plot->graphCount();
+    for (int i = 0; i < count; ++i) {
+        if (plot->graph(i) == graphToFind)
+            return true;
+    }
+    return false;
+}
+
 void MainWindow::onDataReceived(const QByteArray &data)
 {
     QString message = QString::fromUtf8(data).trimmed();
@@ -236,17 +278,32 @@ void MainWindow::onDataReceived(const QByteArray &data)
                 double x = timestamp.toSecsSinceEpoch();
 
                 for (auto& entry : activeFilters) {
+                    if (!entry.graph || !isGraphStillInPlot(ui->plot, entry.graph))
+                        continue;
+
                     double yVal = value;
                     if (entry.processor)
                         yVal = entry.processor->processSample(value);
 
-                    entry.graph->addData(x, yVal);
+                    // 1. Buforuj dane
+                    auto &buffer = dataBuffers[entry.name];
+                    buffer.append(qMakePair(x, yVal));
+                    if (buffer.size() > maxBufferSize)
+                        buffer.remove(0, buffer.size() - maxBufferSize);
 
-                    if (entry.graph->data()->size() > 1000)
-                        entry.graph->data()->removeBefore(x - 300);
+                    // 2. Aktualizuj wykres z bufora
+                    entry.graph->addData(x, yVal); // wyczyść
+                    QVector<double> xData, yData;
+                    for (const auto &pair : buffer) {
+                        xData.append(pair.first);
+                        yData.append(pair.second);
+                    }
+                    entry.graph->data()->removeBefore(x - 300);
                 }
 
-                ui->plot->xAxis->setRange(x - currentXScale, x);
+                if (liveScroll) {
+                    ui->plot->xAxis->setRange(x - currentXScale, x);
+                }
                 if (currentYScale > 0) {
                     // Nic nie zmieniaj – użytkownik już ustawił zakres ręcznie
                 } else {
@@ -272,15 +329,43 @@ void MainWindow::onLegendItemDoubleClicked(QCPLegend *legend, QCPAbstractLegendI
     if (!graph) return;
 
     // Usuń wykres i jego filtr
-    ui->plot->removeGraph(graph);
+    QString graphName = graph->name();  // <--- zapisz zanim usuniesz
+    ui->plot->removeGraph(graph);       // <--- teraz możesz bezpiecznie usunąć
 
-    for (int i = 0; i < activeFilters.size(); ++i) {
-        if (activeFilters[i].graph == graph) {
-            delete activeFilters[i].processor;
-            activeFilters.removeAt(i);
-            break;
-        }
+    auto it = std::find_if(activeFilters.begin(), activeFilters.end(),
+                           [graph](const FilterEntry &entry) {
+                               return entry.graph == graph;
+                           });
+
+    if (it != activeFilters.end()) {
+        delete it->processor;
+        dataBuffers.remove(graphName);   // <--- użyj wcześniej zapamiętanej nazwy
+        activeFilters.erase(it);
     }
 
+    ui->plot->replot();
+    if (activeFilters.isEmpty()) {
+        ui->plot->xAxis->setRange(QDateTime::currentSecsSinceEpoch() - currentXScale,
+                                  QDateTime::currentSecsSinceEpoch());
+        ui->plot->replot();
+    }
+    return;
+}
+
+void MainWindow::on_sliderTimeline_valueChanged(int value)
+{
+    currentSliderValue = value;
+    liveScroll = (value == 100); // jeśli suwak na końcu – automatycznie przewija wykres
+
+    if (activeFilters.isEmpty()) return;
+
+    auto &buffer = dataBuffers[activeFilters.last().name];
+    if (buffer.isEmpty()) return;
+
+    double lastX = buffer.last().first;
+
+    // Przesuń zakres w lewo zależnie od wartości suwaka
+    double offset = (100 - value) * (currentXScale / 100.0); // np. 0-100% przesunięcia
+    ui->plot->xAxis->setRange(lastX - currentXScale - offset, lastX - offset);
     ui->plot->replot();
 }
