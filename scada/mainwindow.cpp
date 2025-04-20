@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->plot->yAxis->grid()->setVisible(false);
     bool isGridVisible = ui->plot->xAxis->grid()->visible();
     ui->checkBoxGrid->setChecked(isGridVisible);
-    // Połączenia
+
     connect(dataClient, &DataClient::connected, this, [this]() {
         updateStatus("Połączono z serwerem");
     });
@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionPolaczZSerwerem, &QAction::triggered, this, &MainWindow::onConnectClicked);
     connect(ui->actionRozlacz, &QAction::triggered, this, &MainWindow::onDisconnectClicked);
-    //connect(ui->actionDodajFiltr, &QAction::triggered, this, &MainWindow::onLoadFilter);
+
     connect(ui->actionDodajFiltr, &QAction::triggered, this, &MainWindow::on_actionDodajFiltr_triggered);
     connect(ui->actionOdswiezFiltry, &QAction::triggered, this, &MainWindow::onRefreshFilters);
     connect(ui->actionZamknij, &QAction::triggered, this, &MainWindow::close);
@@ -76,9 +76,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->listFilters, &QListWidget::itemClicked, this, &MainWindow::onLoadFilter);
     connect(ui->plot, &QCustomPlot::legendDoubleClick, this, &MainWindow::onLegendItemDoubleClicked);
 
-    // loadDummyFilters();
-
-    // Ładuj domyślny filtr „Brak”
     QListWidgetItem* firstItem = ui->listFilters->item(0);
     if (firstItem) {
         ui->listFilters->setCurrentItem(firstItem);
@@ -102,11 +99,9 @@ void MainWindow::updateStatus(const QString &text)
 
 void MainWindow::onConnectClicked()
 {
-    // Domyślne wartości
     QString defaultIp = "127.0.0.1";
     int defaultPort = 1234;
 
-    // Pytanie o IP
     bool okIp;
     QString ip = QInputDialog::getText(this, "Adres IP",
                                        "Wprowadź adres IP serwera:",
@@ -115,7 +110,6 @@ void MainWindow::onConnectClicked()
     if (!okIp || ip.isEmpty())
         return;
 
-    // Pytanie o port
     bool okPort;
     int port = QInputDialog::getInt(this, "Port",
                                     "Wprowadź port serwera:",
@@ -141,7 +135,6 @@ void MainWindow::onApplyDisplayOptions()
     ui->plot->xAxis->grid()->setVisible(gridOn);
     ui->plot->yAxis->grid()->setVisible(gridOn);
 
-    // Styl linii
     int styleIndex = ui->comboBoxLineStyle->currentIndex();
     Qt::PenStyle penStyle = Qt::SolidLine;
 
@@ -155,7 +148,6 @@ void MainWindow::onApplyDisplayOptions()
         activeFilters.last().graph->setPen(QPen(activeFilters.last().graph->pen().color(), 2, penStyle));
     }
 
-    // Zakres X
     if (!activeFilters.isEmpty()) {
         QCPGraph* lastGraph = activeFilters.last().graph;
         if (!lastGraph->data()->isEmpty()) {
@@ -164,12 +156,11 @@ void MainWindow::onApplyDisplayOptions()
             if (liveScroll) {
                 ui->plot->xAxis->setRange(lastX - currentXScale, lastX);
             } else {
-                // np. zatrzymaj na obecnym zakresie albo nie zmieniaj nic
+
             }
         }
     }
 
-    // Zakres Y tylko jeśli faktycznie zmieniony
     currentYScale = ui->spinBoxScaleY->value();
     if (currentYScale > 0) {
         ui->plot->yAxis->setRange(0, currentYScale);
@@ -293,14 +284,12 @@ void MainWindow::onDataReceived(const QByteArray &data)
                     if (entry.processor)
                         yVal = entry.processor->processSample(value);
 
-                    // 1. Buforuj dane
                     auto &buffer = dataBuffers[entry.name];
                     buffer.append(qMakePair(x, yVal));
                     if (buffer.size() > maxBufferSize)
                         buffer.remove(0, buffer.size() - maxBufferSize);
 
-                    // 2. Aktualizuj wykres z bufora
-                    entry.graph->addData(x, yVal); // wyczyść
+                    entry.graph->addData(x, yVal);
                     QVector<double> xData, yData;
                     for (const auto &pair : buffer) {
                         xData.append(pair.first);
@@ -313,7 +302,7 @@ void MainWindow::onDataReceived(const QByteArray &data)
                     ui->plot->xAxis->setRange(x - currentXScale, x);
                 }
                 if (currentYScale > 0) {
-                    // Nic nie zmieniaj – użytkownik już ustawił zakres ręcznie
+
                 } else {
                     ui->plot->yAxis->rescale();
                 }
@@ -336,9 +325,8 @@ void MainWindow::onLegendItemDoubleClicked(QCPLegend *legend, QCPAbstractLegendI
     QCPGraph *graph = qobject_cast<QCPGraph*>(legendItem->plottable());
     if (!graph) return;
 
-    // Usuń wykres i jego filtr
-    QString graphName = graph->name();  // <--- zapisz zanim usuniesz
-    ui->plot->removeGraph(graph);       // <--- teraz możesz bezpiecznie usunąć
+    QString graphName = graph->name();
+    ui->plot->removeGraph(graph);
 
     auto it = std::find_if(activeFilters.begin(), activeFilters.end(),
                            [graph](const FilterEntry &entry) {
@@ -347,7 +335,7 @@ void MainWindow::onLegendItemDoubleClicked(QCPLegend *legend, QCPAbstractLegendI
 
     if (it != activeFilters.end()) {
         delete it->processor;
-        dataBuffers.remove(graphName);   // <--- użyj wcześniej zapamiętanej nazwy
+        dataBuffers.remove(graphName);
         activeFilters.erase(it);
     }
 
@@ -363,7 +351,7 @@ void MainWindow::onLegendItemDoubleClicked(QCPLegend *legend, QCPAbstractLegendI
 void MainWindow::on_sliderTimeline_valueChanged(int value)
 {
     currentSliderValue = value;
-    liveScroll = (value == 100); // jeśli suwak na końcu – automatycznie przewija wykres
+    liveScroll = (value == 100);
 
     if (activeFilters.isEmpty()) return;
 
@@ -372,8 +360,7 @@ void MainWindow::on_sliderTimeline_valueChanged(int value)
 
     double lastX = buffer.last().first;
 
-    // Przesuń zakres w lewo zależnie od wartości suwaka
-    double offset = (100 - value) * (currentXScale / 100.0); // np. 0-100% przesunięcia
+    double offset = (100 - value) * (currentXScale / 100.0);
     ui->plot->xAxis->setRange(lastX - currentXScale - offset, lastX - offset);
     ui->plot->replot();
 }
@@ -382,7 +369,6 @@ void MainWindow::on_actionDodajFiltr_triggered()
 {
     QStringList availableFilters = { "FilterSmooth", "FilterMedian", "FilterAverage" };
 
-    // Sprawdź, które już są dodane
     for (int i = 0; i < ui->listFilters->count(); ++i) {
         availableFilters.removeAll(ui->listFilters->item(i)->text());
     }
@@ -392,7 +378,6 @@ void MainWindow::on_actionDodajFiltr_triggered()
         return;
     }
 
-    // Dialog wyboru filtru
     bool ok;
     QString chosen = QInputDialog::getItem(this, "Dodaj filtr",
                                            "Wybierz filtr do dodania:",
@@ -414,7 +399,6 @@ void MainWindow::on_actionUsunFiltr_triggered()
 
     QString selected = ui->listFilters->currentItem()->text();
 
-    // Sprawdź czy filtr jest aktywny
     for (const auto& entry : activeFilters) {
         if (entry.name == selected) {
             QMessageBox::warning(this, "Nie można usunąć",

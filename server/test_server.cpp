@@ -17,9 +17,9 @@ public:
         connect(server, &QTcpServer::newConnection, this, &TestServer::handleNewConnection);
 
         if (server->listen(QHostAddress::Any, 1234)) {
-            qDebug() << "Serwer nasłuchuje na porcie 1234";
+            qDebug() << "Serwer nasluchuje na porcie 1234";
         } else {
-            qDebug() << "Błąd przy uruchamianiu serwera:" << server->errorString();
+            qDebug() << "Blad przy uruchamianiu serwera:" << server->errorString();
         }
     }
 
@@ -27,11 +27,10 @@ private slots:
     void handleNewConnection()
     {
         socket = server->nextPendingConnection();
-        qDebug() << "Nowe połączenie z" << socket->peerAddress().toString();
+        qDebug() << "Nowe polaczenie z" << socket->peerAddress().toString();
 
         connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
 
-        // Co sekundę wysyłaj dane
         QTimer *timer = new QTimer(this);
         connect(timer, &QTimer::timeout, this, [=]() {
             if (socket->state() == QAbstractSocket::ConnectedState) {
