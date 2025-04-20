@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->listFilters->clear();
-    ui->listFilters->addItem("Brak");
+    ui->listFilters->addItem("None");
     ui->spinBoxScaleX->setValue(40);
     ui->spinBoxScaleY->setValue(10);
 
@@ -36,14 +36,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->labelPlotPlaceholder->hide();
 
-    statusLabel = new QLabel("Status: Brak połączenia");
+    statusLabel = new QLabel("Status: No connection");
     ui->statusbar->addPermanentWidget(statusLabel);
 
     dataClient = new DataClient(this);
 
-    // Konfiguracja wykresu
-    ui->plot->xAxis->setLabel("Czas");
-    ui->plot->yAxis->setLabel("Wartość");
+    ui->plot->xAxis->setLabel("Time");
+    ui->plot->yAxis->setLabel("Value");
 
     QSharedPointer<QCPAxisTickerDateTime> timeTicker(new QCPAxisTickerDateTime);
     timeTicker->setDateTimeFormat("HH:mm:ss");
@@ -56,14 +55,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->checkBoxGrid->setChecked(isGridVisible);
 
     connect(dataClient, &DataClient::connected, this, [this]() {
-        updateStatus("Połączono z serwerem");
+        updateStatus("Connected to server");
     });
     connect(dataClient, &DataClient::disconnected, this, [this]() {
-        updateStatus("Rozłączono");
+        updateStatus("Disconnected");
     });
     connect(dataClient, &DataClient::dataReceived, this, &MainWindow::onDataReceived);
     connect(dataClient, &DataClient::errorOccurred, this, [this](const QString &error) {
-        QMessageBox::warning(this, "Błąd połączenia", error);
+        QMessageBox::warning(this, "Connection error", error);
     });
 
     connect(ui->actionPolaczZSerwerem, &QAction::triggered, this, &MainWindow::onConnectClicked);
@@ -103,8 +102,8 @@ void MainWindow::onConnectClicked()
     int defaultPort = 1234;
 
     bool okIp;
-    QString ip = QInputDialog::getText(this, "Adres IP",
-                                       "Wprowadź adres IP serwera:",
+    QString ip = QInputDialog::getText(this, "IP address",
+                                       "Enter server IP address:",
                                        QLineEdit::Normal, defaultIp, &okIp);
 
     if (!okIp || ip.isEmpty())
@@ -112,7 +111,7 @@ void MainWindow::onConnectClicked()
 
     bool okPort;
     int port = QInputDialog::getInt(this, "Port",
-                                    "Wprowadź port serwera:",
+                                   "Enter server port:",
                                     defaultPort, 1, 65535, 1, &okPort);
 
     if (!okPort)
@@ -193,7 +192,7 @@ void MainWindow::onLoadFilter()
     } else if (selected == "FilterMedian") {
         processor = new FilterMedian(5);
         pen.setColor(Qt::magenta);
-    } else if (selected == "Brak") {
+    } else if (selected == "None") {
         processor = nullptr;
         pen.setColor(Qt::red);
     }
@@ -231,13 +230,13 @@ void MainWindow::onLoadFilter()
 void MainWindow::onRefreshFilters()
 {
     loadDummyFilters();
-    QMessageBox::information(this, "Filtry", "Odświeżono listę filtrów.");
+    QMessageBox::information(this, "Filters", "Filter list refreshed.");
 }
 
 void MainWindow::loadDummyFilters()
 {
     ui->listFilters->clear();
-    ui->listFilters->addItem("Brak");
+    ui->listFilters->addItem("None");
     ui->listFilters->addItem("FilterSmooth");
     ui->listFilters->addItem("FilterMedian");
     ui->listFilters->addItem("FilterAverage");
@@ -256,10 +255,10 @@ bool isGraphStillInPlot(QCustomPlot* plot, QCPGraph* graphToFind)
 void MainWindow::onDataReceived(const QByteArray &data)
 {
     QString message = QString::fromUtf8(data).trimmed();
-    qDebug() << "Odebrano dane:" << message;
+    qDebug() << "Data received:" << message;
 
     if (activeFilters.isEmpty()) {
-        qWarning() << "Brak aktywnego wykresu – najpierw wybierz filtr!";
+        qWarning() << "No active chart - select filter first!";
         return;
     }
 
@@ -374,7 +373,7 @@ void MainWindow::on_actionDodajFiltr_triggered()
     }
 
     if (availableFilters.isEmpty()) {
-        QMessageBox::information(this, "Brak filtrów", "Wszystkie dostępne filtry zostały już dodane.");
+        QMessageBox::information(this, "No filters", "All available filters have already been added.");
         return;
     }
 
@@ -385,7 +384,7 @@ void MainWindow::on_actionDodajFiltr_triggered()
 
     if (ok && !chosen.isEmpty()) {
         ui->listFilters->addItem(chosen);
-        QMessageBox::information(this, "Dodano", "Filtr \"" + chosen + "\" został dodany.");
+        QMessageBox::information(this, "Added", "Filter \"" + chosen + "\" has been added.");
     }
 }
 
@@ -393,7 +392,7 @@ void MainWindow::on_actionDodajFiltr_triggered()
 void MainWindow::on_actionUsunFiltr_triggered()
 {
     if (!ui->listFilters->currentItem()) {
-        QMessageBox::warning(this, "Brak zaznaczenia", "Wybierz filtr do usunięcia z listy.");
+        QMessageBox::warning(this, "No selection", "Select a filter to remove from the list.");
         return;
     }
 
@@ -401,14 +400,14 @@ void MainWindow::on_actionUsunFiltr_triggered()
 
     for (const auto& entry : activeFilters) {
         if (entry.name == selected) {
-            QMessageBox::warning(this, "Nie można usunąć",
-                                 "Ten filtr jest obecnie aktywny na wykresie. Usuń go z wykresu najpierw (kliknij dwukrotnie w legendę).");
+            QMessageBox::warning(this, "Cannot be deleted",
+                                 "This filter is currently active on the chart. Remove it from the chart first (double-click the legend).");
             return;
         }
     }
 
     delete ui->listFilters->takeItem(ui->listFilters->currentRow());
-    QMessageBox::information(this, "Usunięto", "Filtr \"" + selected + "\" został usunięty.");
+    QMessageBox::information(this, "Removed", "Filter \"" + selected + "\" has been deleted.");
 }
 
 

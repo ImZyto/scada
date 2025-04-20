@@ -17,9 +17,9 @@ public:
         connect(server, &QTcpServer::newConnection, this, &TestServer::handleNewConnection);
 
         if (server->listen(QHostAddress::Any, 1234)) {
-            qDebug() << "Serwer nasluchuje na porcie 1234";
+            qDebug() << "The server is listening on port 1234";
         } else {
-            qDebug() << "Blad przy uruchamianiu serwera:" << server->errorString();
+            qDebug() <<"Error starting server:" << server->errorString();
         }
     }
 
@@ -27,7 +27,7 @@ private slots:
     void handleNewConnection()
     {
         socket = server->nextPendingConnection();
-        qDebug() << "Nowe polaczenie z" << socket->peerAddress().toString();
+        qDebug() << "New connection from" << socket->peerAddress().toString();
 
         connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
 

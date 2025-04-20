@@ -84,7 +84,7 @@
          </size>
         </property>
         <property name="title">
-         <string>Opcje wyświetlania</string>
+         <string>Display options</string>
         </property>
         <layout class="QVBoxLayout" name="groupBoxLayout">
          <item>
@@ -109,17 +109,17 @@
           <widget class="QComboBox" name="comboBoxLineStyle">
            <item>
             <property name="text">
-             <string>Linia ciągła</string>
+             <string>Continuous line</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Kropkowana</string>
+             <string>Dotted</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>Przerywana</string>
+             <string>Intermittent</string>
             </property>
            </item>
           </widget>
@@ -127,14 +127,14 @@
          <item>
           <widget class="QCheckBox" name="checkBoxGrid">
            <property name="text">
-            <string>Włącz siatkę</string>
+            <string>Turn on the grid</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="buttonApplyOptions">
            <property name="text">
-            <string>Zastosuj</string>
+            <string>Apply</string>
            </property>
           </widget>
          </item>
@@ -156,7 +156,7 @@
    </property>
    <widget class="QMenu" name="menuPolaczenie">
     <property name="title">
-     <string>Połączenie</string>
+     <string>Connection</string>
     </property>
     <addaction name="actionPolaczZSerwerem"/>
     <addaction name="actionRozlacz"/>
@@ -164,7 +164,7 @@
    </widget>
    <widget class="QMenu" name="menuKonfiguracjaWtyczek">
     <property name="title">
-     <string>Konfiguracja wtyczek</string>
+     <string>Plugin configuration</string>
     </property>
     <addaction name="actionDodajFiltr"/>
     <addaction name="actionUsunFiltr"/>
@@ -176,22 +176,22 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionPolaczZSerwerem">
    <property name="text">
-    <string>Połącz z serwerem</string>
+    <string>Connect to server</string>
    </property>
   </action>
   <action name="actionRozlacz">
    <property name="text">
-    <string>Rozłącz</string>
+    <string>Disconnect</string>
    </property>
   </action>
   <action name="actionZamknij">
    <property name="text">
-    <string>Zamknij</string>
+    <string>Close</string>
    </property>
   </action>
   <action name="actionDodajFiltr">
    <property name="text">
-    <string>Dodaj filtr</string>
+    <string>Add filter</string>
    </property>
    <property name="toolTip">
     <string>Załaduj filtr</string>
@@ -199,12 +199,12 @@
   </action>
   <action name="actionOdswiezFiltry">
    <property name="text">
-    <string>Odśwież</string>
+    <string>Refresh</string>
    </property>
   </action>
   <action name="actionUsunFiltr">
    <property name="text">
-    <string>Usun filtr</string>
+    <string>Remove filter</string>
    </property>
   </action>
  </widget>

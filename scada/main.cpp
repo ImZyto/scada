@@ -4,13 +4,18 @@
 #include <QTextStream>
 #include <QDateTime>
 #include <QDebug>
+#include <QStandardPaths>
+#include <QDir>
 
 void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
     Q_UNUSED(type);
     Q_UNUSED(context);
 
-    QFile file("C:/Users/micha/Desktop/test_log.txt");
+    QString logDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(logDir);
+
+    QFile file(logDir + "/test_log.txt");
     if (file.open(QIODevice::Append | QIODevice::Text)) {
         QTextStream out(&file);
         out << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz ");
@@ -20,8 +25,9 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
 int main(int argc, char *argv[])
 {
-    qInstallMessageHandler(customMessageHandler); // <<< TO JEST KLUCZOWE
-    qDebug() << "TEST: Aplikacja wystartowała!";
+    qInstallMessageHandler(customMessageHandler);
+    qDebug() << "TEST: The application has started!";
+
     QApplication a(argc, argv);
     MainWindow w;
     w.show();

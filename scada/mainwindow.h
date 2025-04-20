@@ -59,7 +59,7 @@ private:
     QVector<QCPGraph*> graphs;
     DataProcessor* currentFilter;
 
-    QVector<double> xData, yData;  // dane do wykresu
+    QVector<double> xData, yData;
     int dataCounter = 0;
     int currentXScale = 60;
     int currentYScale = 10;
