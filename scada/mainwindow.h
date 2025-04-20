@@ -42,6 +42,8 @@ private slots:
     void onDataReceived(const QByteArray &data);
     void onLegendItemDoubleClicked(QCPLegend *legend, QCPAbstractLegendItem *item, QMouseEvent *event);
     void on_sliderTimeline_valueChanged(int value);
+    void on_actionDodajFiltr_triggered();
+    void on_actionUsunFiltr_triggered();
 
 private:
     QList<FilterEntry> activeFilters;

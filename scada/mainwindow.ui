@@ -166,7 +166,8 @@
     <property name="title">
      <string>Konfiguracja wtyczek</string>
     </property>
-    <addaction name="actionZaladujFiltr"/>
+    <addaction name="actionDodajFiltr"/>
+    <addaction name="actionUsunFiltr"/>
     <addaction name="actionOdswiezFiltry"/>
    </widget>
    <addaction name="menuPolaczenie"/>
@@ -188,9 +189,9 @@
     <string>Zamknij</string>
    </property>
   </action>
-  <action name="actionZaladujFiltr">
+  <action name="actionDodajFiltr">
    <property name="text">
-    <string>Załaduj filtr</string>
+    <string>Dodaj filtr</string>
    </property>
    <property name="toolTip">
     <string>Załaduj filtr</string>
@@ -199,6 +200,11 @@
   <action name="actionOdswiezFiltry">
    <property name="text">
     <string>Odśwież</string>
+   </property>
+  </action>
+  <action name="actionUsunFiltr">
+   <property name="text">
+    <string>Usun filtr</string>
    </property>
   </action>
  </widget>

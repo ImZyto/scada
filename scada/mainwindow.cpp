@@ -10,6 +10,11 @@
 #include <QInputDialog>
 
 
+QStringList availableFilterTypes = {
+    "FilterAverage",
+    "FilterSmooth",
+    "FilterMedian"
+};
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
     , currentFilter(nullptr)
 {
     ui->setupUi(this);
+    ui->listFilters->clear();
+    ui->listFilters->addItem("Brak");
     ui->spinBoxScaleX->setValue(40);
     ui->spinBoxScaleY->setValue(10);
 
@@ -61,14 +68,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->actionPolaczZSerwerem, &QAction::triggered, this, &MainWindow::onConnectClicked);
     connect(ui->actionRozlacz, &QAction::triggered, this, &MainWindow::onDisconnectClicked);
-    connect(ui->actionZaladujFiltr, &QAction::triggered, this, &MainWindow::onLoadFilter);
+    //connect(ui->actionDodajFiltr, &QAction::triggered, this, &MainWindow::onLoadFilter);
+    connect(ui->actionDodajFiltr, &QAction::triggered, this, &MainWindow::on_actionDodajFiltr_triggered);
     connect(ui->actionOdswiezFiltry, &QAction::triggered, this, &MainWindow::onRefreshFilters);
     connect(ui->actionZamknij, &QAction::triggered, this, &MainWindow::close);
     connect(ui->buttonApplyOptions, &QPushButton::clicked, this, &MainWindow::onApplyDisplayOptions);
     connect(ui->listFilters, &QListWidget::itemClicked, this, &MainWindow::onLoadFilter);
     connect(ui->plot, &QCustomPlot::legendDoubleClick, this, &MainWindow::onLegendItemDoubleClicked);
 
-    loadDummyFilters();
+    // loadDummyFilters();
 
     // Ładuj domyślny filtr „Brak”
     QListWidgetItem* firstItem = ui->listFilters->item(0);
@@ -369,3 +377,54 @@ void MainWindow::on_sliderTimeline_valueChanged(int value)
     ui->plot->xAxis->setRange(lastX - currentXScale - offset, lastX - offset);
     ui->plot->replot();
 }
+
+void MainWindow::on_actionDodajFiltr_triggered()
+{
+    QStringList availableFilters = { "FilterSmooth", "FilterMedian", "FilterAverage" };
+
+    // Sprawdź, które już są dodane
+    for (int i = 0; i < ui->listFilters->count(); ++i) {
+        availableFilters.removeAll(ui->listFilters->item(i)->text());
+    }
+
+    if (availableFilters.isEmpty()) {
+        QMessageBox::information(this, "Brak filtrów", "Wszystkie dostępne filtry zostały już dodane.");
+        return;
+    }
+
+    // Dialog wyboru filtru
+    bool ok;
+    QString chosen = QInputDialog::getItem(this, "Dodaj filtr",
+                                           "Wybierz filtr do dodania:",
+                                           availableFilters, 0, false, &ok);
+
+    if (ok && !chosen.isEmpty()) {
+        ui->listFilters->addItem(chosen);
+        QMessageBox::information(this, "Dodano", "Filtr \"" + chosen + "\" został dodany.");
+    }
+}
+
+
+void MainWindow::on_actionUsunFiltr_triggered()
+{
+    if (!ui->listFilters->currentItem()) {
+        QMessageBox::warning(this, "Brak zaznaczenia", "Wybierz filtr do usunięcia z listy.");
+        return;
+    }
+
+    QString selected = ui->listFilters->currentItem()->text();
+
+    // Sprawdź czy filtr jest aktywny
+    for (const auto& entry : activeFilters) {
+        if (entry.name == selected) {
+            QMessageBox::warning(this, "Nie można usunąć",
+                                 "Ten filtr jest obecnie aktywny na wykresie. Usuń go z wykresu najpierw (kliknij dwukrotnie w legendę).");
+            return;
+        }
+    }
+
+    delete ui->listFilters->takeItem(ui->listFilters->currentRow());
+    QMessageBox::information(this, "Usunięto", "Filtr \"" + selected + "\" został usunięty.");
+}
+
+
