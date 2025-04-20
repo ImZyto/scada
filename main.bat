@@ -11,31 +11,31 @@ set "SERVER_EXE=%SERVER_BUILD%\test_server.exe"
 set "QT_PLUGIN_PATH=%SCADA_BUILD%\platforms"
 
 if not exist "%SCADA_EXE%" (
-    echo [Blad] Nie znaleziono pliku: %SCADA_EXE%
+    echo [Error] File not found: %SCADA_EXE%
     pause
     exit /b
 )
 
 if not exist "%SERVER_EXE%" (
-    echo [Blad] Nie znaleziono pliku: %SERVER_EXE%
+    echo [Error] File not found: %SERVER_EXE%
     pause
     exit /b
 )
 
 set "QT_QPA_PLATFORM_PLUGIN_PATH=%QT_PLUGIN_PATH%"
-echo [Info] QT_QPA_PLATFORM_PLUGIN_PATH ustawiono na: %QT_QPA_PLATFORM_PLUGIN_PATH%
+echo [Info] QT_QPA_PLATFORM_PLUGIN_PATH set to: %QT_QPA_PLATFORM_PLUGIN_PATH%
 
 cd /d "%SCADA_BUILD%"
 
-echo [Info] Uruchamianie serwera...
+echo [Info] Starting server...
 start "" "%SERVER_EXE%"
 timeout /t 1 > nul
 
-echo [Info] Uruchamianie SCADA...
+echo [Info] Starting SCADA...
 "%SCADA_EXE%"
 
 echo.
-echo [Info] Zakonczono dzialanie SCADA.
+echo [Info] SCADA operation terminated.
 pause
 
 endlocal
