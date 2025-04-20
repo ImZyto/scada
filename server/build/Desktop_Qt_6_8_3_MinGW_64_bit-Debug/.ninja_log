@@ -1,0 +1,20 @@
+# ninja log v6
+6	705	7649570163395521	build.ninja	355e52cfa7f31264
+42	3989	7649460020216119	test_server_autogen/timestamp	9d0626f4c57c9e48
+42	3989	7649460020216119	C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/serwer/serwer/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/test_server_autogen/mocs_compilation.cpp	9d0626f4c57c9e48
+4002	4104	7649460021285962	CMakeFiles/test_server.dir/test_server_autogen/mocs_compilation.cpp.obj	6a05af159730d97d
+42	3989	7649460020216119	test_server_autogen/mocs_compilation.cpp	9d0626f4c57c9e48
+42	3989	7649460020216119	C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/serwer/serwer/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/test_server_autogen/timestamp	9d0626f4c57c9e48
+7349	7582	7649460054763348	test_server.exe	98da2e6c7ec955f0
+4006	7349	7649460021335962	CMakeFiles/test_server.dir/test_server.cpp.obj	92feb5dd0894546e
+34	1939	7649570251307877	test_server_autogen/timestamp	9d0626f4c57c9e48
+34	1939	7649570251307877	test_server_autogen/mocs_compilation.cpp	9d0626f4c57c9e48
+34	1939	7649570251307877	C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/serwer/serwer/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/test_server_autogen/timestamp	9d0626f4c57c9e48
+34	1939	7649570251307877	C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/serwer/serwer/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/test_server_autogen/mocs_compilation.cpp	9d0626f4c57c9e48
+1941	2018	7649570270420610	CMakeFiles/test_server.dir/test_server_autogen/mocs_compilation.cpp.obj	6a05af159730d97d
+41	3901	7649570972688031	test_server_autogen/timestamp	9d0626f4c57c9e48
+41	3901	7649570972688031	test_server_autogen/mocs_compilation.cpp	9d0626f4c57c9e48
+41	3901	7649570972688031	C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/serwer/serwer/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/test_server_autogen/timestamp	9d0626f4c57c9e48
+41	3901	7649570972688031	C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/serwer/serwer/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug/test_server_autogen/mocs_compilation.cpp	9d0626f4c57c9e48
+3903	6305	7649571011296948	CMakeFiles/test_server.dir/test_server.cpp.obj	92feb5dd0894546e
+6305	6503	7649571035304660	test_server.exe	98da2e6c7ec955f0

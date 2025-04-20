@@ -1,0 +1,22 @@
+^C:\USERS\MICHA\DESKTOP\MAGISTERKA\1_ROK\3\ZAAWANSOWANE_C++_2025L\SCADA\BUILD\CMAKEFILES\B0F4405F05136BD4FD957401106C9420\AUTOUIC_(CONFIG).STAMP.RULE
+setlocal
+cd C:\Users\micha\Desktop\magisterka\1_rok\3\zaawansowane_C++_2025L\scada\build\scada
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\MICHA\DESKTOP\MAGISTERKA\1_ROK\3\ZAAWANSOWANE_C++_2025L\SCADA\SCADA\CMAKELISTS.TXT
+setlocal
+C:\Qt\Tools\CMake_64\bin\cmake.exe -SC:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada -BC:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build --check-stamp-file C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/scada/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

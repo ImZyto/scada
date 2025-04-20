@@ -1,0 +1,6 @@
+set(__QT_DEPLOY_TARGET_test_server_FILE C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/server/MinSizeRel/test_server.exe)
+set(__QT_DEPLOY_TARGET_test_server_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_test_server_RUNTIME_DLLS C:/Qt/6.8.3/mingw_64/bin/Qt6Network.dll;C:/Qt/6.8.3/mingw_64/bin/Qt6Core.dll)
+set(__QT_DEPLOY_TARGET_scada_FILE C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/scada/MinSizeRel/scada.exe)
+set(__QT_DEPLOY_TARGET_scada_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_scada_RUNTIME_DLLS C:/Qt/6.8.3/mingw_64/bin/Qt6Network.dll;C:/Qt/6.8.3/mingw_64/bin/Qt6PrintSupport.dll;C:/Qt/6.8.3/mingw_64/bin/Qt6Widgets.dll;C:/Qt/6.8.3/mingw_64/bin/Qt6Gui.dll;C:/Qt/6.8.3/mingw_64/bin/Qt6Core.dll)

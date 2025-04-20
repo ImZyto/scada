@@ -1,0 +1,189 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "scada",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-scada-Debug-ec76a033187df9761de8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "scada",
+					"targetIndexes" : 
+					[
+						3,
+						4,
+						5,
+						6,
+						7,
+						8
+					]
+				},
+				{
+					"build" : "filter_average_plugin",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-filter_average_plugin-Debug-a433967f26ca2e874306.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "filter_average_plugin",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "scada_system"
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "scada",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						3,
+						4,
+						5,
+						6,
+						7,
+						8
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2
+					],
+					"name" : "filter_average_plugin",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "filter_average_plugin::@f154bdc4553b8f649d14",
+					"jsonFile" : "target-filter_average_plugin-Debug-fb4dec4d4108a90529ed.json",
+					"name" : "filter_average_plugin",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "filter_average_plugin_autogen::@f154bdc4553b8f649d14",
+					"jsonFile" : "target-filter_average_plugin_autogen-Debug-8a0f326b43dd15276b77.json",
+					"name" : "filter_average_plugin_autogen",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "filter_average_plugin_autogen_timestamp_deps::@f154bdc4553b8f649d14",
+					"jsonFile" : "target-filter_average_plugin_autogen_timestamp_deps-Debug-004e711bf079a67a6771.json",
+					"name" : "filter_average_plugin_autogen_timestamp_deps",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "scada::@b5e6ed65ab829bd9b2a1",
+					"jsonFile" : "target-scada-Debug-d7ef5f6cb5a36b24d349.json",
+					"name" : "scada",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "scada_autogen::@b5e6ed65ab829bd9b2a1",
+					"jsonFile" : "target-scada_autogen-Debug-7031b9bcb1a0cdbb11d3.json",
+					"name" : "scada_autogen",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "scada_autogen_timestamp_deps::@b5e6ed65ab829bd9b2a1",
+					"jsonFile" : "target-scada_autogen_timestamp_deps-Debug-21cb789a6723ae9ccf36.json",
+					"name" : "scada_autogen_timestamp_deps",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "scada_core::@b5e6ed65ab829bd9b2a1",
+					"jsonFile" : "target-scada_core-Debug-363f1812d3a8254da77f.json",
+					"name" : "scada_core",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "scada_core_autogen::@b5e6ed65ab829bd9b2a1",
+					"jsonFile" : "target-scada_core_autogen-Debug-86ca534b772e7ad46711.json",
+					"name" : "scada_core_autogen",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "scada_core_autogen_timestamp_deps::@b5e6ed65ab829bd9b2a1",
+					"jsonFile" : "target-scada_core_autogen_timestamp_deps-Debug-efa446e6a7bbc66a46b0.json",
+					"name" : "scada_core_autogen_timestamp_deps",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/Desktop_Qt_6_8_3_MinGW_64_bit-Debug",
+		"source" : "C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

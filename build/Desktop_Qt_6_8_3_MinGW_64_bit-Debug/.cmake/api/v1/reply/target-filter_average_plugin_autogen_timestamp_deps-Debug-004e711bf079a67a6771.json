@@ -1,0 +1,34 @@
+{
+	"backtrace" : 0,
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : 
+		[
+			"filter_average_plugin/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 0,
+			"id" : "scada_core::@b5e6ed65ab829bd9b2a1"
+		}
+	],
+	"id" : "filter_average_plugin_autogen_timestamp_deps::@f154bdc4553b8f649d14",
+	"isGeneratorProvided" : true,
+	"name" : "filter_average_plugin_autogen_timestamp_deps",
+	"paths" : 
+	{
+		"build" : "filter_average_plugin",
+		"source" : "filter_average_plugin"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

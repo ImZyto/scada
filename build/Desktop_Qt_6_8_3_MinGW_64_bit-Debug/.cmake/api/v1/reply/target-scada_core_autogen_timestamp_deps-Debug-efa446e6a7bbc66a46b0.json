@@ -1,0 +1,27 @@
+{
+	"backtrace" : 0,
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : 
+		[
+			"scada/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			}
+		]
+	},
+	"id" : "scada_core_autogen_timestamp_deps::@b5e6ed65ab829bd9b2a1",
+	"isGeneratorProvided" : true,
+	"name" : "scada_core_autogen_timestamp_deps",
+	"paths" : 
+	{
+		"build" : "scada",
+		"source" : "scada"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}

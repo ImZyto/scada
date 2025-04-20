@@ -1,0 +1,9 @@
+C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/CMakeFiles/INSTALL.dir
+C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/server/CMakeFiles/test_server.dir
+C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/server/CMakeFiles/INSTALL.dir
+C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/server/CMakeFiles/ALL_BUILD.dir
+C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/scada/CMakeFiles/scada.dir
+C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/scada/CMakeFiles/INSTALL.dir
+C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/build/scada/CMakeFiles/ALL_BUILD.dir

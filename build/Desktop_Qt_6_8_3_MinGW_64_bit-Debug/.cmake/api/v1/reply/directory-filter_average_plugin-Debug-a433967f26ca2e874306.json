@@ -1,0 +1,45 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"filter_average_plugin/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 31,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "C:/Users/micha/Desktop/magisterka/1_rok/3/zaawansowane_C++_2025L/scada/scada/plugins",
+			"paths" : 
+			[
+				"filter_average_plugin/libfilter_average_plugin.dll"
+			],
+			"targetId" : "filter_average_plugin::@f154bdc4553b8f649d14",
+			"targetIndex" : 0,
+			"type" : "target"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "filter_average_plugin",
+		"source" : "filter_average_plugin"
+	}
+}
